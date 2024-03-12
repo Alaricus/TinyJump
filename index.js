@@ -10,10 +10,6 @@ document.querySelector('body').addEventListener('keyup', (e) => {
 });
 const score = document.querySelector('span');
 let state = {};
-const init = () => { state = {
-  mpf: 1000/60, m: { l: false, r: false }, p: { h: 50, w: 50, x: 200, y: 750, v: -9 },
-  f: 0, o: false, planks: [{ x: 200, y: 700, w: 100, h: 25, t: 'r' }], score: 0
-};};
 const rectsIntersect = (a, b) => a.x <= b.x + b.w && b.x <= a.x + a.w && a.y <= b.y + b.h && b.y <= a.y + a.h;
 const generatePlanks = () => {
   let highestPlankY = 810;
@@ -32,7 +28,7 @@ const generatePlanks = () => {
   }
 }
 const update = () => {
-  state.p.v += 0.1;
+  state.p.v += 0.3;
   state.p.y += state.p.v;
   if (state.m.l) { state.p.x -= 3; }
   if (state.m.r) { state.p.x += 3; }
@@ -40,8 +36,8 @@ const update = () => {
   if (state.p.x > 600 - state.p.w / 2) { state.p.x = state.p.w / -2; }
   state.planks.forEach(p => {
     if (state.p.v >= 0 && state.p.y + state.p.h < p.y + p.h / 2 && rectsIntersect({ ...state.p }, { ...p })) {
-      if (p.t === 'r') { state.p.v = -9; }
-      if (p.t === 's') { state.p.v = -13; }
+      if (p.t === 'r') { state.p.v = -15; }
+      if (p.t === 's') { state.p.v = -21; }
       if (p.t === 'u') { p.y = 900; }
     }
   });
@@ -52,7 +48,7 @@ const update = () => {
     state.score += Math.floor((state.p.v * -1));
   }
   score.innerText = state.score;
-  if (state.p.y + state.p.h > 800) { state.o = true; state.p.v = -9; }
+  if (state.p.y + state.p.h > 800) { state.o = true; state.p.v = -15; }
 };
 const draw = () => {
   ctx.clearRect(0, 0, 600, 800);
@@ -82,19 +78,28 @@ const draw = () => {
   ctx.font = '60px Arial';
   if (state.o) { ctx.fillText('Game Over', 300, 400); }
 };
+
 const main = () => {
-  if (!state.o) { update(); draw(); }
   requestAnimationFrame(main);
   const msNow = window.performance.now()
   const msPassed = msNow - msPrev;
   if (msPassed < state.mpf) return;
+  if (!state.o) { update(); draw(); }
   const excessTime = msPassed % state.mpf;
   msPrev = msNow - excessTime;
   state.f += 1;
 };
+
+const init = () => { state = {
+  mpf: 1000/60, m: { l: false, r: false }, p: { h: 50, w: 50, x: 200, y: 750, v: -15 },
+  f: 0, o: false, planks: [{ x: 200, y: 700, w: 100, h: 25, t: 'r' }], score: 0
+};};
+
 init();
 let msPrev = window.performance.now();
 main();
+
+
 
 /*
   state
